@@ -1,3 +1,4 @@
+import argparse
 import os
 
 # To Import API Key
@@ -12,13 +13,30 @@ api_key = os.getenv("GEMINI_API_KEY")
 if api_key is None:
     raise RuntimeError("Missing GEMINI_API_KEY in .env file")
 
+# Take argument from command line for passing to Gemini
+parser = argparse.ArgumentParser(description="Chatbot")
+parser.add_argument("user_prompt", type=str, help="User prompt")
+args = parser.parse_args() # Now we can access `args.user_prompt`
+
 # Create New Instance of Gemini Client
 client = genai.Client(api_key=api_key)
 
-# First attempt at calling AI. Hard Coded request.
+# Calling Geminin Client
 response = client.models.generate_content(
-    model='gemini-2.5-flash', contents="Why is Boot.dev such a great place to learn backend development? Use one paragraph maximum."
+    model='gemini-2.5-flash', contents=args.user_prompt
 )
+
+# Get metadata of response
+usage = response.usage_metadata
+
+# Verify that response has metadata
+if usage is None:
+    raise RuntimeError("Response metadata is None")
+
+
+print(f"Prompt tokens: {usage.prompt_token_count}")
+print(f"Response tokens: {usage.candidates_token_count}")
+print("Reponse:")
 print(response.text)  # Print response from AI
 
 
