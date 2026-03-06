@@ -17,6 +17,7 @@ if api_key is None:
 # Take argument from command line for passing to Gemini
 parser = argparse.ArgumentParser(description="Chatbot")
 parser.add_argument("user_prompt", type=str, help="User prompt")
+parser.add_argument("--verbose", action="store_true", help="Enable verbose output") # Adding Verbose output option
 args = parser.parse_args() # Now we can access `args.user_prompt`
 
 # List for user prompts
@@ -37,10 +38,15 @@ usage = response.usage_metadata
 if usage is None:
     raise RuntimeError("Response metadata is None")
 
+# Output section
+# If user enables verbose mode
+if args.verbose is True:
+    print(f"User prompt: {args.user_prompt}")
+    print(f"Prompt tokens: {usage.prompt_token_count}")
+    print(f"Response tokens: {usage.candidates_token_count}")
+    print("Reponse:")
 
-print(f"Prompt tokens: {usage.prompt_token_count}")
-print(f"Response tokens: {usage.candidates_token_count}")
-print("Reponse:")
+# Response from Gemini
 print(response.text)  # Print response from AI
 
 
