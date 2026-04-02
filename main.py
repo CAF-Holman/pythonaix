@@ -1,5 +1,8 @@
 import argparse
 import os
+from prompts import *
+from call_function import *
+
 
 # To Import API Key
 from dotenv import load_dotenv
@@ -28,7 +31,13 @@ client = genai.Client(api_key=api_key)
 
 # Calling Geminin Client
 response = client.models.generate_content(
-    model='gemini-2.5-flash', contents=messages
+    model='gemini-2.5-flash',
+    contents=messages,
+    config=types.GenerateContentConfig(
+        system_instruction=system_prompt,
+        temperature=0,
+        tools=[available_functions]
+        ),
 )
 
 # Get metadata of response
@@ -46,8 +55,14 @@ if args.verbose is True:
     print(f"Response tokens: {usage.candidates_token_count}")
     print("Reponse:")
 
+
+# Print Calling Function statement
+if response.function_calls:
+    for function_call in response.function_calls:
+        print(f"Calling function: {function_call.name}({function_call.args})")
+else:
 # Response from Gemini
-print(response.text)  # Print response from AI
+    print(response.text)  # Print response from AI
 
 
 # Main Section of Code
